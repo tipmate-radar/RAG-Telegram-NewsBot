@@ -21,9 +21,31 @@ TELEGRAM_CHAT_ID = os.getenv("CHAT_ID", "YOUR_CHAT_ID_HERE")
 # Add as many RSS feeds as you like — you can mix news, blogs, etc.
 
 RSS_FEEDS = [
-    "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
-    "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en",
-    "https://www.theverge.com/rss/index.xml"
+    # Оригинальные источники (оставляем)
+    "https://rss.mytimes.com/services/xml/rss/myt/Technology.xml",
+    "https://news.google.com/rss?hl=en-IN&gl=IN&cid=IN:en",
+    "https://www.theverge.com/rss/index.xml",
+    
+    # Испания (HoReCa, туризм, персонал)
+    "https://www.hosteleriadeespana.es/feed",
+    "https://www.segittur.es/feed",
+    "https://www.ine.es/ine/rss/rss_turismo.xml",
+    "https://www.gremirestauracio.cat/feed",
+    "https://www.gremihotelsbcn.com/feed",
+    
+    # Европа (туризм, статистика)
+    "https://www.unwto.org/rss",
+    "https://ec.europa.eu/eurostat/rss",
+    "https://sifted.eu/articles.rss",  # технологии Европы
+    
+    # Конкуренты
+    "https://wearetipjar.com/blogs.rss",
+    "https://www.tipsi.com/blog.rss",
+    "https://www.globaltips.com/rss",
+    
+    # HR / персонал
+    "https://www.hosteltur.com/rss/talento",
+    "https://www.revfine.com/feed"
 ]
 
 # -------------------------------
