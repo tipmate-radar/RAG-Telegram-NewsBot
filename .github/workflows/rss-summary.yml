@@ -1,7 +1,7 @@
 name: Daily RSS to Telegram
 on:
   schedule:
-    - cron: "0 3,15 * * *"
+    - cron: "0 17 * * *"
   workflow_dispatch:
 jobs:
   run-script:
