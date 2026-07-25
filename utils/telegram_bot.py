@@ -1,9 +1,9 @@
 # ==========================================
 # telegram_bot.py — Send messages to Telegram
 # ==========================================
-
 import requests
 from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+
 
 def send_telegram_message(message: str):
     """
@@ -16,9 +16,9 @@ def send_telegram_message(message: str):
     payload = {
         "chat_id": TELEGRAM_CHAT_ID,
         "text": message,
-        "parse_mode": "HTML"
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True
     }
-
     try:
         response = requests.post(url, data=payload)
         if response.status_code != 200:
