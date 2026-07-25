@@ -44,6 +44,7 @@ RSS_FEEDS = [
     "https://news.google.com/rss/search?q=%22Tap+Tiiip%22+pourboire&hl=fr&gl=FR&ceid=FR:fr",
     "https://news.google.com/rss/search?q=Tippie+Trinkgeld&hl=de&gl=DE&ceid=DE:de",
     "https://news.google.com/rss/search?q=TackPay+mancia&hl=it&gl=IT&ceid=IT:it",
+    "https://tackpayapp.medium.com/feed",
 
     # HR / персонал
     "https://www.hosteltur.com/rss/talento",
