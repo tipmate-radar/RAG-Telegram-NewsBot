@@ -4,29 +4,18 @@ import os
 import re
 from datetime import datetime
 from bs4 import BeautifulSoup
-from config import RSS_FEEDS
+from config import RSS_FEEDS, MAX_ARTICLES_PER_RUN
 
 CACHE_FILE = "data/cache.json"
 
-# Отрасль гостеприимства в широком смысле — там, где потенциально есть персонал и чаевые
-RELEVANCE_KEYWORDS = [
-    "hotel", "hoteles", "hostel", "restaurant", "restaurante", "café", "cafe",
-    "bar", "spa", "salon", "salón", "hospitality", "horeca", "tourism", "turismo",
-    "turístico", "staff", "employee", "personal", "camarero", "waiter", "barista",
-    "housekeeping", "tip", "tips", "propina", "propinas", "trinkgeld", "mancia",
-    "pourboire", "gratuity",
-]
+ENTRIES_PER_FEED = 15
 
-# Домены конкурентов — релевантны всегда, даже без ключевых слов выше
-COMPETITOR_DOMAINS = [
-    "tipjar", "tipsi", "globaltips", "edrixx", "sunday", "wearetipjar",
-]
+RELEVANCE_KEYWORDS = ["hotel", "hoteles", "hostel", "restaurant", "restaurante", "café", "cafe", "bar", "spa", "salon", "salón", "hospitality", "horeca", "tourism", "turismo", "turístico", "staff", "employee", "personal", "camarero", "waiter", "barista", "housekeeping", "tip", "tips", "propina", "propinas", "trinkgeld", "mancia", "pourboire", "gratuity"]
 
-MAX_ARTICLES_PER_RUN = 10  # общий лимит на один запуск
+COMPETITOR_DOMAINS = ["tipjar", "tipsi", "globaltips", "global.tips", "edrixx", "sunday", "wearetipjar", "sipay", "sipos", "tipplus", "tipead", "tiepad", "tipsyou", "taptiiip", "tippie", "tackpay", "justtip"]
 
 
 def clean_html(raw_html: str) -> str:
-    """Remove HTML tags and entities from RSS summary."""
     soup = BeautifulSoup(raw_html, "html.parser")
     text = soup.get_text()
     return re.sub(r'\s+', ' ', text).strip()
@@ -40,40 +29,50 @@ def is_relevant(title: str, summary: str, link: str) -> bool:
 
 
 def fetch_new_articles():
-    # Load cache
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, "r") as f:
             cache = json.load(f)
     else:
         cache = {"processed_links": []}
 
-    new_articles = []
+    candidates = []
     for feed_url in RSS_FEEDS:
-        print(f"Fetching feed: {feed_url}")
         feed = feedparser.parse(feed_url)
-        for entry in feed.entries[:5]:  # limit to 5 per feed
-            link = entry.link
-            if link in cache["processed_links"]:
+        total = len(feed.entries)
+        kept = 0
+
+        for entry in feed.entries[:ENTRIES_PER_FEED]:
+            link = getattr(entry, "link", None)
+            if not link or link in cache["processed_links"]:
                 continue
 
-            title = entry.title
-            summary = clean_html(entry.summary)
+            title = getattr(entry, "title", "")
+            raw_summary = getattr(entry, "summary", "")
+            summary = clean_html(raw_summary)
 
             if not is_relevant(title, summary, link):
-                cache["processed_links"].append(link)  # не показывать снова
+                cache["processed_links"].append(link)
                 continue
 
-            article = {
+            candidates.append({
                 "source": feed.feed.title if "title" in feed.feed else "Unknown Source",
                 "title": title,
                 "summary": summary,
                 "link": link,
                 "published": getattr(entry, "published", str(datetime.now())),
-            }
-            new_articles.append(article)
-            cache["processed_links"].append(link)
+            })
+            kept += 1
 
+        print(f"Feed: {feed_url} | entries: {total} | relevant new: {kept}")
+
+    selected = candidates[:MAX_ARTICLES_PER_RUN]
+
+    for article in selected:
+        cache["processed_links"].append(article["link"])
+
+    os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
     with open(CACHE_FILE, "w") as f:
         json.dump(cache, f, indent=2)
 
-    return new_articles[:MAX_ARTICLES_PER_RUN]
+    print(f"\nCandidates found: {len(candidates)} | selected this run: {len(selected)}")
+    return selected
