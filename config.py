@@ -56,7 +56,7 @@ RSS_FEEDS = [
 # 🔹 SYSTEM SETTINGS
 # -------------------------------
 # Number of new articles to summarize each run
-MAX_ARTICLES_PER_RUN = 10
+MAX_ARTICLES_PER_RUN = 25
 
 # Path to vector DB and cache files
 CHROMA_DB_PATH = "./data/chroma"
