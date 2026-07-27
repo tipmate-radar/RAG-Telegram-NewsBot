@@ -10,7 +10,7 @@ from utils.rag_store import add_summary_to_store
 
 def classify_rubric(article) -> str:
     text = (article.get("title", "") + " " + article.get("link", "")).lower()
-   if any(k in text for k in [
+    if any(k in text for k in [
         "tipjar", "tipsi", "globaltips", "global.tips", "edrixx", "sunday",
         "sipay", "sipos", "tipplus", "tipead", "tiepad",
         "tipsyou", "tap tiiip", "taptiiip", "tippie", "tackpay", "justtip"
