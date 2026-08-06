@@ -7,22 +7,7 @@ from utils.summarizer import summarize_text, translate_to_russian
 from utils.telegram_bot import send_telegram_message
 from utils.rag_store import add_summary_to_store
 
-COMPETITOR_KEYWORDS = ["tipjar", "tipsi", "globaltips", "global.tips", "edrixx", "sunday", "sipay", "sipos", "tipplus", "tipead", "tiepad", "tipsyou", "tap tiiip", "taptiiip", "tippie", "tackpay", "justtip"]
-
-STAFF_KEYWORDS = ["staff", "turnover", "retention", "employee", "hiring", "personal", "rotación"]
-
-TAX_KEYWORDS = ["tax", "propina", "trinkgeld", "mancia", "pourboire", "irpf", "fiscal"]
-
-
-def classify_rubric(article) -> str:
-    text = (article.get("title", "") + " " + article.get("link", "")).lower()
-    if any(k in text for k in COMPETITOR_KEYWORDS):
-        return "🏁 Конкуренты"
-    if any(k in text for k in STAFF_KEYWORDS):
-        return "👥 Персонал"
-    if any(k in text for k in TAX_KEYWORDS):
-        return "💰 Налоги/чаевые"
-    return "📰 Рынок"
+RUBRIC_LABELS = {"competitors": "🏁 Конкуренты", "tips_tax": "💰 Чаевые и налоги", "staff": "👥 Персонал", "market": "📰 Рынок"}
 
 
 def main():
@@ -40,7 +25,7 @@ def main():
         print(f"[{idx}] Summarizing: {article['title'][:80]}...")
         summary = summarize_text(article["summary"])
         title_ru = translate_to_russian(article["title"])
-        rubric = classify_rubric(article)
+        rubric = RUBRIC_LABELS.get(article["rubric"], "📰 Рынок")
 
         message = (
             f"{rubric}\n"
