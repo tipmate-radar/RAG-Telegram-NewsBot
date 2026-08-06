@@ -22,9 +22,6 @@ RSS_FEEDS = [
     "https://www.hosteltur.com/feed/economia",
     "https://www.segittur.es/feed",
 
-    # Испания — ресторанный сегмент (адреса непроверенные, лог покажет)
-    "https://restauracionnews.com/feed",
-    "https://www.inforestauracion.com/feed",
 
     # Международный отраслевой
     "https://www.revfine.com/feed",
