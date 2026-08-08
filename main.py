@@ -2,12 +2,12 @@
 # main.py — Orchestrates RSS → Summary → Telegram
 # ==========================================
 
-from utils.rss_reader import fetch_new_articles
+from utils.rss_reader import fetch_new_articles, mark_as_sent
 from utils.summarizer import summarize_text, translate_to_russian
 from utils.telegram_bot import send_telegram_message
 from utils.rag_store import add_summary_to_store
 
-RUBRIC_LABELS = {"competitors": "🏁 Конкуренты", "tips_tax": "💰 Чаевые и налоги", "staff": "👥 Персонал", "market": "📰 Рынок"}
+RUBRIC_LABELS = {"competitors": "🏁 Конкуренты", "tips_tax": "💰 Чаевые и платежи", "staff": "👥 Персонал"}
 
 
 def main():
@@ -35,6 +35,7 @@ def main():
         )
 
         send_telegram_message(message)
+        mark_as_sent(article["link"])
         add_summary_to_store(article["title"], summary, article["link"])
 
     print("\nAll new articles summarized and sent to Telegram!")
