@@ -5,12 +5,17 @@
 from transformers import pipeline
 from deep_translator import GoogleTranslator
 
-# Load once globally (so it doesn't reload for every article)
+ERROR_MARKERS = ["error 500", "server error", "that's an error", "please try again", "403 forbidden", "404 not found", "access denied", "gateway timeout"]
+
 summarizer = pipeline("summarization", model="google/flan-t5-small")
 
 
+def is_error_text(text: str) -> bool:
+    t = text.lower()
+    return any(marker in t for marker in ERROR_MARKERS)
+
+
 def translate_to_russian(text: str) -> str:
-    """Translate any text to Russian. Falls back to original on failure."""
     if not text.strip():
         return text
     try:
@@ -21,25 +26,22 @@ def translate_to_russian(text: str) -> str:
 
 
 def summarize_text(text: str, max_words: int = 60) -> str:
-    """
-    Generate a concise summary of the input text, translated to Russian.
-    """
-    if not text.strip():
-        return "Нет содержания для суммаризации."
+    if not text.strip() or is_error_text(text):
+        return None
 
-    max_input_length = 1000
-    text = text[:max_input_length]
+    text = text[:1000]
 
     try:
-        result = summarizer(
-            text,
-            max_length=max_words,
-            min_length=25,
-            do_sample=False
-        )
+        result = summarizer(text, max_length=max_words, min_length=25, do_sample=False)
         summary_en = result[0]["summary_text"].strip()
     except Exception as e:
         print(f"Summarization error: {e}")
-        summary_en = text[:200] + "..."
+        if len(text) > 100:
+            summary_en = text[:200] + "..."
+        else:
+            return None
+
+    if is_error_text(summary_en):
+        return None
 
     return translate_to_russian(summary_en)
